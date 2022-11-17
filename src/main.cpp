@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 using namespace std;
 
 #define PI 3.1415926535
@@ -20,6 +20,8 @@ static float time_ms, ball_velocity, bat_velocity, bat_length,
 static double ball_radious;
 static pair<float,float> ball_pos, ball_direction,
 	bat_top_left, bat_bottom_right;
+static bool game_over;
+static vector<pair<float,float>> bricks;
 
 static void draw_curcle ( pair<float,float> pos, double radius, const float* color )
 {
@@ -58,13 +60,19 @@ static bool ball_inside_bat ( void )
 		return false;
 }
 
-static void display_func ( void )
+static void next_game ( void )
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();
-	time_ms = ((float)glutGet ( GLUT_ELAPSED_TIME ) / 1000.0f );
-	gluOrtho2D ( -1*(width/2.0), width/2.0, height/2.0, -1*(height/2.0) );
+	glColor4fv ( c_white );
+	glRasterPos2f ( -100, 0 );
+	const unsigned char ov[] = "GAME OVER";
+	glutBitmapString ( GLUT_BITMAP_HELVETICA_18, ov );
+	const unsigned char ag[] = "Press Any Key to Play Again";
+	glRasterPos2f ( -150, 30 );
+	glutBitmapString ( GLUT_BITMAP_HELVETICA_18, ag );
+}
 
+static void game_play ( void )
+{
 	// move ball
 	ball_pos.first += ball_direction.first * ball_velocity;
 	ball_pos.second += ball_direction.second * ball_velocity;
@@ -85,7 +93,10 @@ static void display_func ( void )
 	// ball vs wall collision
 	if ( ball_pos.first >= width/2.0 - ball_radious/2.0 ) ball_direction.first *= -1;
 	if ( ball_pos.first <= -1.0*(width/2.0) + ball_radious/2.0 ) ball_direction.first *= -1;
-	if ( ball_pos.second >= height/2.0 - ball_radious/2.0 ) ball_direction.second *= -1;
+	if ( ball_pos.second >= height/2.0 - ball_radious/2.0 ) {
+		ball_direction.second *= -1;
+		game_over = true;
+	}
 	if ( ball_pos.second <= -1.0*(height/2.0) + ball_radious/2.0 ) ball_direction.second *= -1;
 
 	// ball vs bat collision
@@ -98,6 +109,20 @@ static void display_func ( void )
 	draw_curcle ( ball_pos, ball_radious, c_red );
 	// draw bat
 	draw_block ( bat_top_left, bat_bottom_right, c_green );
+}
+
+static void display_func ( void )
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glLoadIdentity();
+	time_ms = ((float)glutGet ( GLUT_ELAPSED_TIME ) / 1000.0f );
+	gluOrtho2D ( -1*(width/2.0), width/2.0, height/2.0, -1*(height/2.0) );
+
+	if ( game_over ) {
+		next_game ();
+	} else {
+		game_play ();
+	}
 
 	glutSwapBuffers();
 }
@@ -115,16 +140,6 @@ static void mouse_input ( int button, int state, int x, int y )
 static void mouse_motion_input ( int x, int y )
 {
 	mouse_x = x; mouse_y = y;
-}
-
-static void keyboard_input ( unsigned char key, int x, int y )
-{
-	switch ( key ) {
-		case 8: break;
-		case 9: break;
-		case 'A': break;
-		default: break;
-	}
 }
 
 void shape_menu ( int id )
@@ -150,6 +165,16 @@ void initialize_all ( void )
 	bat_top_left = make_pair ( -bat_length, (height/2.0)-50.0 );
 	bat_bottom_right = make_pair ( bat_length, (height/2.0)-30.0 );
 	bat_direction = 0.0;
+
+	game_over = false;
+}
+
+static void keyboard_input ( unsigned char key, int x, int y )
+{
+	if ( game_over == true ) {
+		initialize_all ();
+		game_over = false;
+	}
 }
 
 void cleanup_all ( void )

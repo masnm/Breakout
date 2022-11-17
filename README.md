@@ -8,6 +8,6 @@ Simple Breakout game in c and GLUT
 - [X] draw bat
 - [X] move bat
 - [X] collition between bat and ball
-- [ ] game over when touch floor
+- [X] game over when touch floor
 - [ ] draw bricks
 - [ ] remove bricks when hit by ball
