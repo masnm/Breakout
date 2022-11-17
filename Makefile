@@ -1,5 +1,5 @@
 CC=g++
-cflags=-O2 -std=c++17 -Wshadow -Wall -pedantic -lm
+cflags=-O2 -std=c++20 -Wshadow -Wall -pedantic -lm
 dbg=-fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG -g -DLOCAL
 glut=-lGL -lGLU -lglut
 objs=
