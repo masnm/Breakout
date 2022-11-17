@@ -9,3 +9,6 @@ bin/game.out: src/main.cpp $(objs)
 
 run: ./bin/game.out
 	./bin/game.out
+
+prepare:
+	mkdir bin
