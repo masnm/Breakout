@@ -1,6 +1,8 @@
 # Breakout
 Simple Breakout game in c and GLUT
 
+https://user-images.githubusercontent.com/49545838/202477851-1f0e7356-9944-4d6a-8c49-20402ad2952e.mp4
+
 ### TODOS
 - [X] Setup the window
 - [X] draw the ball
