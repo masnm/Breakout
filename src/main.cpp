@@ -23,7 +23,6 @@ struct Brick {
 };
 
 static size_t width = 1000, height = 1000;
-static size_t mouse_x, mouse_y;
 static float time_ms, ball_velocity, bat_velocity, bat_length,
 			 bat_direction;
 static double ball_radious;
@@ -33,6 +32,7 @@ static bool game_over, game_paused;
 static int score;
 static vector<Brick> bricks;
 
+// from stack overflow
 static void draw_curcle ( pair<float,float> pos, double radius, const float* color )
 {
 	double twicePi = 2.0 * 3.142;
@@ -78,8 +78,7 @@ static bool ball_inside_bat ( void )
 	if ( x >= bat_top_left.first && x <= bat_bottom_right.first &&
 			y >= bat_top_left.second && y <= bat_bottom_right.second )
 		return true;
-	else
-		return false;
+	return false;
 }
 
 static bool ball_inside_brick ( Brick& brick )
@@ -100,8 +99,7 @@ static bool ball_inside_brick ( Brick& brick )
 	if ( x >= brick.top_left.first && x <= brick.bottom_right.first &&
 			y >= brick.top_left.second && y <= brick.bottom_right.second )
 		return 4;
-	else
-		return 0;
+	return 0;
 }
 
 static void next_game ( void )
@@ -124,6 +122,7 @@ static void game_play ( void )
 	// move bat
 	bat_top_left.first += bat_velocity*bat_direction;
 	bat_bottom_right.first += bat_velocity*bat_direction;
+
 	// clamp bat
 	if ( bat_top_left.first <= -1.0*(width/2.0) ) {
 		bat_top_left.first = -1.0*(width/2.0);
@@ -222,6 +221,7 @@ void paused_game ( void )
 	string scr = to_string ( score );
 	auto ch = reinterpret_cast<unsigned char*>(const_cast<char*>(scr.c_str()));
 	glutBitmapString ( GLUT_BITMAP_HELVETICA_18, ch );
+
 	glRasterPos2f ( -10, 0 );
 	string ss = "PAUSED";
 	ch = reinterpret_cast<unsigned char*>(const_cast<char*>(ss.c_str()));
@@ -248,19 +248,6 @@ static void display_func ( void )
 
 static void idle ( void ) { glutPostRedisplay (); }
 
-static void mouse_input ( int button, int state, int x, int y )
-{
-	if ( button == GLUT_LEFT_BUTTON ) {
-		if ( state == GLUT_DOWN ) { }
-		if ( state == GLUT_UP ) { }
-	}
-}
-
-static void mouse_motion_input ( int x, int y )
-{
-	mouse_x = x; mouse_y = y;
-}
-
 void initialize_all ( void )
 {
 	ball_pos = make_pair ( 0.0f, 0.0f );
@@ -275,7 +262,6 @@ void initialize_all ( void )
 	bat_direction = 0.0;
 
 	score = 0;
-	game_over = false;
 
 	brick_size = make_pair ( 50.0, 20.0 );
 	for ( float row = -500.0 + 40.0 ; row < -300.0 ; row += 30.0 ) {
@@ -287,6 +273,7 @@ void initialize_all ( void )
 					);
 		}
 	}
+	game_over = false;
 	game_paused = false;
 }
 
@@ -337,7 +324,7 @@ int main ( int argc, char* argv[] )
 	glutInitWindowPosition ( 10, 10 );
 	glutInitDisplayMode ( GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
 
-	glutCreateWindow ( "GLUT Template" );
+	glutCreateWindow ( "BreakOut" );
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable( GL_BLEND );
@@ -345,9 +332,7 @@ int main ( int argc, char* argv[] )
 
 	glutDisplayFunc ( display_func );
 	glutIdleFunc ( idle );
-	glutMouseFunc ( mouse_input );
 	glutKeyboardFunc ( keyboard_input );
-	glutPassiveMotionFunc ( mouse_motion_input );
 	glutSpecialFunc ( arrow_keys_down );
 	glutSpecialUpFunc ( arrow_keys_up );
 
